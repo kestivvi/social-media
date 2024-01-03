@@ -1,0 +1,24 @@
+**/__pycache__/
+__pycache__
+db.sqlite3
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development settings
+.env
+
+# Django generated files
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# Dependency directories
+venv/
+env/
+.env/
+env_bak/
