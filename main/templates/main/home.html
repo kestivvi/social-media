@@ -13,7 +13,7 @@
         {% csrf_token %}
         <button
           type="submit"
-          class="btn btn-danger"
+          class="btn btn-outline-danger"
           name="post-id"
           value="{{post.id}}"
         >
@@ -26,7 +26,7 @@
         {% csrf_token %}
         <button
           type="submit"
-          class="btn btn-warning"
+          class="btn btn-outline-warning"
           name="user-id"
           value="{{post.author.id}}"
         >
