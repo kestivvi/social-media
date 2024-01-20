@@ -63,8 +63,8 @@ def create_post(request):
     return render(request, "main/create_post.html", {"form": form})
 
 @login_required(login_url="/login")
-@permission_required("main.add_comment", login_url="/login", raise_exception=True)
-def add_comment(request, post_id):
+@permission_required("main.create_comment", login_url="/login", raise_exception=True)
+def create_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
 
     if request.method == "POST":
@@ -79,7 +79,7 @@ def add_comment(request, post_id):
     else:
         form = CommentForm()
 
-    return render(request, "main/add_comment.html", {"form": form})
+    return render(request, "main/add_comment.html", {"form": form, "post": post})
 
 @login_required(login_url="/login")
 @permission_required("main.delete_comment", login_url="/login", raise_exception=True)
@@ -97,8 +97,9 @@ def sign_up(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            permission = Permission.objects.get(codename="add_post")
-            user.user_permissions.add(permission)
+            user.user_permissions.add(Permission.objects.get(codename="add_post"))
+            user.user_permissions.add(Permission.objects.get(codename="create_comment"))
+            user.user_permissions.add(Permission.objects.get(codename="delete_comment"))
             login(request, user)
             return redirect("/home")
     else:

@@ -66,11 +66,19 @@
           </li>
         {% endif %}
       {% endfor %}
-      <button
-      class="btn btn-outline-primary mx-2"
-      value="{{post.id}}">
-      Comment
-      </button>
+      <form action="/create_comment/{{ post.id }}/" method="post">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="btn btn-outline-primary ml-3"
+          name="create-comment"
+          value="{{post.id}}"
+        >
+          Comment
+        </button>
+      </form>
+
+    </ul>
   </div>
 </div>
 {% empty %}
