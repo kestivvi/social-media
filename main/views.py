@@ -17,6 +17,7 @@ def logout_view(request):
 @login_required(login_url="/login")
 def home(request):
     posts = Post.objects.all()
+    comments = Comment.objects.all()
 
     if request.method == "POST":
         post_id = request.POST.get("post-id")
@@ -43,7 +44,7 @@ def home(request):
                 except:
                     pass
 
-    return render(request, "main/home.html", {"posts": posts})
+    return render(request, "main/home.html", {"posts": posts, "comments": comments})
 
 
 @login_required(login_url="/login")
