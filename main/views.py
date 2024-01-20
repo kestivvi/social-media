@@ -1,11 +1,12 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
-from django.shortcuts import render, redirect
-from .forms import RegisterForm, PostForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import RegisterForm, PostForm, CommentForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import login, logout
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.models import Permission
+from django.http import JsonResponse
 
 
 def logout_view(request):
@@ -60,6 +61,35 @@ def create_post(request):
 
     return render(request, "main/create_post.html", {"form": form})
 
+@login_required(login_url="/login")
+@permission_required("main.add_comment", login_url="/login", raise_exception=True)
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect("/home")  # Możesz dostosować ścieżkę przekierowania
+
+    else:
+        form = CommentForm()
+
+    return render(request, "main/add_comment.html", {"form": form})
+
+@login_required(login_url="/login")
+@permission_required("main.delete_comment", login_url="/login", raise_exception=True)
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+
+    if request.method == 'POST':
+        comment.delete()
+        return JsonResponse({'message': 'Comment deleted successfully'}, status=200)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def sign_up(request):
     if request.method == "POST":
