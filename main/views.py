@@ -22,6 +22,7 @@ def home(request):
     if request.method == "POST":
         post_id = request.POST.get("post-id")
         user_id = request.POST.get("user-id")
+        comment_id = request.POST.get("comment-id")
 
         if post_id:
             post = Post.objects.filter(id=post_id).first()
@@ -43,6 +44,12 @@ def home(request):
                     group.user_set.remove(user)
                 except:
                     pass
+        elif comment_id:
+            comment = Comment.objects.filter(id=comment_id).first()
+            if Comment and (
+                comment.author == request.user or request.user.has_perm("main.delete_comment")
+            ):
+                comment.delete()
 
     return render(request, "main/home.html", {"posts": posts, "comments": comments})
 
@@ -63,7 +70,7 @@ def create_post(request):
     return render(request, "main/create_post.html", {"form": form})
 
 @login_required(login_url="/login")
-@permission_required("main.create_comment", login_url="/login", raise_exception=True)
+@permission_required("main.add_post", login_url="/login", raise_exception=True)
 def create_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
 
@@ -82,7 +89,7 @@ def create_comment(request, post_id):
     return render(request, "main/add_comment.html", {"form": form, "post": post})
 
 @login_required(login_url="/login")
-@permission_required("main.delete_comment", login_url="/login", raise_exception=True)
+@permission_required("main.add_post", login_url="/login", raise_exception=True)
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
 
@@ -98,8 +105,6 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             user.user_permissions.add(Permission.objects.get(codename="add_post"))
-            user.user_permissions.add(Permission.objects.get(codename="create_comment"))
-            user.user_permissions.add(Permission.objects.get(codename="delete_comment"))
             login(request, user)
             return redirect("/home")
     else:
