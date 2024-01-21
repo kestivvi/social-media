@@ -19,6 +19,13 @@ def home(request):
     posts = Post.objects.all()
     comments = Comment.objects.all()
 
+    i = len(posts)-1
+    tmp = []
+    while i >= 0:
+        tmp.append(posts[i])
+        i -= 1
+    posts = tmp
+
     if request.method == "POST":
         post_id = request.POST.get("post-id")
         user_id = request.POST.get("user-id")
@@ -73,6 +80,7 @@ def create_post(request):
 @permission_required("main.add_post", login_url="/login", raise_exception=True)
 def create_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    comments = Comment.objects.filter(post=post)
 
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -86,18 +94,18 @@ def create_comment(request, post_id):
     else:
         form = CommentForm()
 
-    return render(request, "main/add_comment.html", {"form": form, "post": post})
+    return render(request, "main/add_comment.html", {"form": form, "post": post, "comments": comments})
 
-@login_required(login_url="/login")
-@permission_required("main.add_post", login_url="/login", raise_exception=True)
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
+# @login_required(login_url="/login")
+# @permission_required("main.add_post", login_url="/login", raise_exception=True)
+# def delete_comment(request, comment_id):
+#     comment = get_object_or_404(Comment, pk=comment_id)
 
-    if request.method == 'POST':
-        comment.delete()
-        return JsonResponse({'message': 'Comment deleted successfully'}, status=200)
+#     if request.method == 'POST':
+#         comment.delete()
+#         return JsonResponse({'message': 'Comment deleted successfully'}, status=200)
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+#     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def sign_up(request):
     if request.method == "POST":
