@@ -62,7 +62,7 @@ def create_post(request):
     return render(request, "main/create_post.html", {"form": form})
 
 @login_required(login_url="/login")
-@permission_required("main.add_comment", login_url="/login", raise_exception=True)
+@permission_required("main.add_post", login_url="/login", raise_exception=True)
 def add_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
 
@@ -81,7 +81,7 @@ def add_comment(request, post_id):
     return render(request, "main/add_comment.html", {"form": form})
 
 @login_required(login_url="/login")
-@permission_required("main.delete_comment", login_url="/login", raise_exception=True)
+@permission_required("main.add_post", login_url="/login", raise_exception=True)
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
 
