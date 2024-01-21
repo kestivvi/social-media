@@ -17,10 +17,19 @@ def logout_view(request):
 @login_required(login_url="/login")
 def home(request):
     posts = Post.objects.all()
+    comments = Comment.objects.all()
+
+    i = len(posts)-1
+    tmp = []
+    while i >= 0:
+        tmp.append(posts[i])
+        i -= 1
+    posts = tmp
 
     if request.method == "POST":
         post_id = request.POST.get("post-id")
         user_id = request.POST.get("user-id")
+        comment_id = request.POST.get("comment-id")
 
         if post_id:
             post = Post.objects.filter(id=post_id).first()
@@ -42,8 +51,14 @@ def home(request):
                     group.user_set.remove(user)
                 except:
                     pass
+        elif comment_id:
+            comment = Comment.objects.filter(id=comment_id).first()
+            if Comment and (
+                comment.author == request.user or request.user.has_perm("main.delete_comment")
+            ):
+                comment.delete()
 
-    return render(request, "main/home.html", {"posts": posts})
+    return render(request, "main/home.html", {"posts": posts, "comments": comments})
 
 
 @login_required(login_url="/login")
@@ -63,8 +78,9 @@ def create_post(request):
 
 @login_required(login_url="/login")
 @permission_required("main.add_post", login_url="/login", raise_exception=True)
-def add_comment(request, post_id):
+def create_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    comments = Comment.objects.filter(post=post)
 
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -78,26 +94,25 @@ def add_comment(request, post_id):
     else:
         form = CommentForm()
 
-    return render(request, "main/add_comment.html", {"form": form})
+    return render(request, "main/add_comment.html", {"form": form, "post": post, "comments": comments})
 
-@login_required(login_url="/login")
-@permission_required("main.add_post", login_url="/login", raise_exception=True)
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
+# @login_required(login_url="/login")
+# @permission_required("main.add_post", login_url="/login", raise_exception=True)
+# def delete_comment(request, comment_id):
+#     comment = get_object_or_404(Comment, pk=comment_id)
 
-    if request.method == 'POST':
-        comment.delete()
-        return JsonResponse({'message': 'Comment deleted successfully'}, status=200)
+#     if request.method == 'POST':
+#         comment.delete()
+#         return JsonResponse({'message': 'Comment deleted successfully'}, status=200)
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+#     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def sign_up(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            permission = Permission.objects.get(codename="add_post")
-            user.user_permissions.add(permission)
+            user.user_permissions.add(Permission.objects.get(codename="add_post"))
             login(request, user)
             return redirect("/home")
     else:
