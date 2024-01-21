@@ -49,7 +49,7 @@
               <p class="ml-5">{{ comment.description }}</p>
             </div>
             <div>
-              {% if user == post.author or user.is_staff %}
+              {% if user == comment.author or user.is_staff %}
               <form method="post">
                 {% csrf_token %}
                 <button
