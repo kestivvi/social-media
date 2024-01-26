@@ -26,6 +26,12 @@ def home(request):
         i -= 1
     posts = tmp
 
+    for p in posts:
+        p.description = p.description.split("\r\n")
+    for c in comments:
+        c.description = c.description.split("\n")
+
+
     if request.method == "POST":
         post_id = request.POST.get("post-id")
         user_id = request.POST.get("user-id")
