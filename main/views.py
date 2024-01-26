@@ -88,6 +88,10 @@ def create_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     comments = Comment.objects.filter(post=post)
 
+    post.description = post.description.split("\r\n")
+    for c in comments:
+        c.description = c.description.split("\n")
+
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
