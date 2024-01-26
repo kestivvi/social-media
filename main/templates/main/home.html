@@ -12,6 +12,14 @@
     </div>
     <div>
       {% if user == post.author or perms.main.delete_post %}
+      <a href="/modify-post/{{ post.id }}">
+        <button
+          type="submit"
+          class="btn btn-outline-secondary"
+        >
+          Modify
+        </button>
+      </a>
       <form method="post">
         {% csrf_token %}
         <button
@@ -23,14 +31,6 @@
           Delete
         </button>
       </form>
-      <a href="/modify-post/{{ post.id }}">
-        <button
-          type="submit"
-          class="btn btn-outline-secondary"
-        >
-          Modify
-        </button>
-      </a>
       {% endif %}
       {% if user.is_staff %}
       <form method="post">

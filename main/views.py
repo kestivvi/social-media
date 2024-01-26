@@ -100,6 +100,7 @@ def create_comment(request, post_id):
 @permission_required("main.add_post", login_url="/login", raise_exception=True)
 def modify_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    oryginal_val = {'title': post.title, 'description': post.description}
 
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -109,7 +110,7 @@ def modify_post(request, post_id):
             post.save()
             return redirect("/home")
     else:
-        form = PostForm()
+        form = PostForm(initial=oryginal_val)
 
     return render(request, "main/modify_post.html", {"form": form, "post": post})
 
