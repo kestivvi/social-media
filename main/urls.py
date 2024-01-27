@@ -10,4 +10,5 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path('create_comment/<int:post_id>/', views.create_comment, name='create_comment'),
     path('modify-post/<int:post_id>/', views.modify_post, name='modify_post'),
+    path('modify-comment/<int:comment_id>/', views.modify_comment, name='modify_comment'),
 ]

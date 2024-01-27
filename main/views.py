@@ -7,6 +7,7 @@ from django.contrib.auth import login, logout
 from .models import Post, Comment
 from django.contrib.auth.models import Permission
 from django.http import JsonResponse
+from django.db.models import Q
 
 
 def logout_view(request):
@@ -123,6 +124,30 @@ def modify_post(request, post_id):
         form = PostForm(initial=oryginal_val)
 
     return render(request, "main/modify_post.html", {"form": form, "post": post})
+
+@login_required(login_url="/login")
+@permission_required("main.add_post", login_url="/login", raise_exception=True)
+def modify_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    post = comment.post
+    comments = Comment.objects.filter(Q(post=post) & ~Q(id=comment_id))
+    oryginal_val = {'description': comment.description}
+
+    post.description = post.description.split("\r\n")
+    for c in comments:
+        c.description = c.description.split("\n")
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment.description = request.POST.get('description', '')
+            comment.save()
+            return redirect("/home")
+    else:
+        form = CommentForm(initial=oryginal_val)
+
+    return render(request, "main/add_comment.html", {"form": form, "post": post, "comments": comments})
+
 
 def sign_up(request):
     if request.method == "POST":
