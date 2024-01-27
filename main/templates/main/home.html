@@ -12,9 +12,11 @@
         {% for line in post.description %}
           {{ line }}<br>
         {% endfor %}
-        {% comment %} <form method="post">
+        <form method="post">
           {% csrf_token %}
-          {% if post_instance.is_liked_by_user(user) %}
+          {% load liked_posts %}
+          {% is_liked_by_user post user as is_liked %}
+          {% if is_liked %}
           <button class="btn icon-btn btn-primary"
           type="submit"
           name="like"
@@ -33,7 +35,7 @@
             </svg>
           </button>
           {% endif %}
-        </form> {% endcomment %}
+        </form>
       </p>
     </div>
     <div>
