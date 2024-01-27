@@ -17,7 +17,7 @@
           {% load liked_posts %}
           {% is_liked_by_user post user as is_liked %}
           {% if is_liked %}
-          <button class="btn icon-btn btn-primary"
+          <button class="btn icon-btn btn-outline-primary"
           type="submit"
           name="like"
           value="{{post.id}} {{user.id}}">
