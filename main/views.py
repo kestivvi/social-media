@@ -32,11 +32,11 @@ def home(request):
     for c in comments:
         c.description = c.description.split("\n")
 
-
     if request.method == "POST":
         post_id = request.POST.get("post-id")
         user_id = request.POST.get("user-id")
         comment_id = request.POST.get("comment-id")
+        like = request.POST.get("like")
 
         if post_id:
             post = Post.objects.filter(id=post_id).first()
@@ -64,9 +64,17 @@ def home(request):
                 comment.author == request.user or request.user.has_perm("main.delete_comment")
             ):
                 comment.delete()
+        elif like:
+            like = like.split()
+            post = Post.objects.filter(id=like[0]).first()
+            user = get_user_model().objects.filter(id=like[1]).first()
+            is_user = post.liked_by.filter(id=like[1]).exists()
+            if is_user:
+                post.liked_by.remove(user)
+            else:
+                post.liked_by.add(user)
 
     return render(request, "main/home.html", {"posts": posts, "comments": comments})
-
 
 @login_required(login_url="/login")
 @permission_required("main.add_post", login_url="/login", raise_exception=True)
