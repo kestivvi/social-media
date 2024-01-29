@@ -13,6 +13,9 @@ class Post(models.Model):
     def __str__(self):
         return self.title + "\n" + self.description
 
+    def is_liked_by_user(self,user):
+        return self.liked_by.filter(id=user.id).exists()
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
